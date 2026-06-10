@@ -6,6 +6,53 @@ ul.panel-body {
   gap: 1rem;
 }
 
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.filter-control {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.filter-control label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.filter-control select {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  background: #0f1729;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.95rem;
+}
+
+.filter-control select:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+
+.empty-state {
+  padding: 1.5rem;
+  border: 1px dashed #334155;
+  border-radius: 1rem;
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.05);
+  text-align: center;
+  font-size: 0.98rem;
+}
+
 ul.panel-body li {
   border: 1px solid #2f3a4a;
   border-radius: 1.25rem;

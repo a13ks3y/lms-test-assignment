@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { EnrolmentQueueService } from './enrolment-queue.service';
 import { RequestItem } from './request-item/request-item';
@@ -16,7 +16,37 @@ export class App implements OnInit {
   protected readonly userService = inject(UserService);
   protected readonly queue = this.queueService.queue;
   protected readonly stats = this.queueService.stats;
+  protected readonly isLoaded = this.queueService.isLoaded;
   protected readonly user = this.userService.user;
+
+  protected readonly statusFilter = signal<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  protected readonly typeFilter = signal<'all' | 'course' | 'bundle'>('all');
+  protected readonly branchFilter = signal<string>('all');
+
+  protected readonly branches = computed(() =>
+    Array.from(new Set(this.queue().map((request) => request.branch))),
+  );
+
+  protected readonly filteredQueue = computed(() =>
+    this.queue().filter((request) => {
+      const statusMatches = this.statusFilter() === 'all' || request.status === this.statusFilter();
+      const typeMatches = this.typeFilter() === 'all' || request.type === this.typeFilter();
+      const branchMatches = this.branchFilter() === 'all' || request.branch === this.branchFilter();
+      return statusMatches && typeMatches && branchMatches;
+    }),
+  );
+
+  protected readonly visibleStats = computed(() => {
+    const items = this.filteredQueue();
+    return {
+      total: items.length,
+      pending: items.filter((request) => request.status === 'pending').length,
+      approved: items.filter((request) => request.status === 'approved').length,
+      rejected: items.filter((request) => request.status === 'rejected').length,
+      course: items.filter((request) => request.type === 'course').length,
+      bundle: items.filter((request) => request.type === 'bundle').length,
+    };
+  });
 
   protected readonly approve = (id: number): void => {
     const resolvedBy = this.user()?.name ?? 'System';

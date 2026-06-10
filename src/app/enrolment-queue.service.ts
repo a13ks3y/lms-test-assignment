@@ -40,8 +40,10 @@ export interface QueueStats {
 export class EnrolmentQueueService {
   private readonly http = inject(HttpClient);
   private readonly requests = signal<Request[]>([]);
+  private readonly loaded = signal(false);
 
   readonly queue = this.requests.asReadonly();
+  readonly isLoaded = this.loaded.asReadonly();
 
   readonly stats = computed<QueueStats>(() => {
     const items = this.requests();
@@ -89,10 +91,14 @@ export class EnrolmentQueueService {
     this.http
       .get<{ requests?: Request[] }>(dataUrl)
       .subscribe({
-        next: (data) => this.requests.set(data.requests ?? []),
+        next: (data) => {
+          this.requests.set(data.requests ?? []);
+          this.loaded.set(true);
+        },
         error: (error) => {
           console.error(`Error loading ${dataUrl}:`, error);
           this.requests.set([]);
+          this.loaded.set(true);
         },
     });
   }

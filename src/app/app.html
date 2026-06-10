@@ -1,17 +1,64 @@
 <div class="panel">
   <h1>Enrolment Request Queue</h1>
-  <ng-container *ngIf="queue().length > 0; else loading">
-    <ul class="panel-body">
-      <app-request-item
-        *ngFor="let request of queue()"
-        [request]="request"
-        (approve)="approve($event)"
-        (reject)="reject($event)"
-        (view)="viewDetails($event)">
-      </app-request-item>
-    </ul>
-    <div class="panel-footer">
-      Total {{stats().total}} | Pending {{stats().pending}} | Approved {{stats().approved}} | Rejected {{stats().rejected}} | Course {{stats().course}} | Bundle {{stats().bundle}}
+  <ng-container *ngIf="isLoaded(); else loading">
+    <div class="filters">
+      <div class="filter-control">
+        <label for="status-filter">Status</label>
+        <select id="status-filter" data-test="status-filter" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="type-filter">Request Type</label>
+        <select id="type-filter" data-test="type-filter" [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value)">
+          <option value="all">All</option>
+          <option value="course">Course</option>
+          <option value="bundle">Bundle</option>
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="branch-filter">Branch</label>
+        <select id="branch-filter" data-test="branch-filter" [value]="branchFilter()" (change)="branchFilter.set($any($event.target).value)">
+          <option value="all">All</option>
+          <option *ngFor="let branch of branches()" [value]="branch">
+            {{ branch }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <ng-container *ngIf="filteredQueue().length > 0; else noMatches">
+      <ul class="panel-body">
+        <li app-request-item
+          data-test="request-item"
+          [attr.data-request-id]="request.id"
+          *ngFor="let request of filteredQueue()"
+          [request]="request"
+          (approve)="approve($event)"
+          (reject)="reject($event)"
+          (view)="viewDetails($event)">
+        </li>
+      </ul>
+    </ng-container>
+
+    <ng-template #noMatches>
+      <div class="empty-state" data-test="empty-state">
+        No enrolment requests match the selected filters.
+      </div>
+    </ng-template>
+
+    <div class="panel-footer" data-test="footer-counts">
+      Total <span data-test="count-total">{{visibleStats().total}}</span>
+      | Pending <span data-test="count-pending">{{visibleStats().pending}}</span>
+      | Approved <span data-test="count-approved">{{visibleStats().approved}}</span>
+      | Rejected <span data-test="count-rejected">{{visibleStats().rejected}}</span>
+      | Course <span data-test="count-course">{{visibleStats().course}}</span>
+      | Bundle <span data-test="count-bundle">{{visibleStats().bundle}}</span>
     </div>
   </ng-container>
 
