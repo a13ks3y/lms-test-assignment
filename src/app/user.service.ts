@@ -6,6 +6,7 @@ export interface User {
   name: string;
   email: string;
   role: 'admin' | 'student' | 'lecturer';
+  collegeId: number;
   permissions: string[];
   allowedBranches: string[];
 }

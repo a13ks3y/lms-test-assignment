@@ -16,17 +16,30 @@
         <div>Name: {{ requestData.requester.name }}</div>
         <div>Email: {{ requestData.requester.email }}</div>
       </div>
+      <div>College #: {{ requestData.collegeId }}</div>
     </div>
 
     <div class="request-note" *ngIf="requestData.adminNote">
-      {{ requestData.adminNote }}
+      Note: {{ requestData.adminNote }}
+    </div>
+
+    <div class="request-warning" *ngIf="requestData.collegeId !== currentCollegeId()">
+      This request belongs to a different college and cannot be approved or rejected.
     </div>
 
     <div class="request-actions">
-      <button type="button" class="btn-approve" (click)="approve.emit(requestData.id)" [disabled]="requestData.status !== 'pending'">
+      <button
+        type="button"
+        class="btn-approve"
+        (click)="approve.emit(requestData.id)"
+        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId()">
         Approve
       </button>
-      <button type="button" class="btn-reject" (click)="reject.emit(requestData.id)" [disabled]="requestData.status !== 'pending'">
+      <button
+        type="button"
+        class="btn-reject"
+        (click)="reject.emit(requestData.id)"
+        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId()">
         Reject
       </button>
       <button type="button" class="btn-view" (click)="view.emit(requestData.id)">

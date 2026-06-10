@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { EnrolmentQueueService } from './enrolment-queue.service';
 import { RequestItem } from './request-item/request-item';
-import { UserService } from './user.service';
+import { User } from './user.service';
 
 @Component({
   selector: 'app-root',
@@ -13,11 +13,56 @@ import { UserService } from './user.service';
 })
 export class App implements OnInit {
   protected readonly queueService = inject(EnrolmentQueueService);
-  protected readonly userService = inject(UserService);
   protected readonly queue = this.queueService.queue;
   protected readonly stats = this.queueService.stats;
   protected readonly isLoaded = this.queueService.isLoaded;
-  protected readonly user = this.userService.user;
+
+  protected readonly testUsers: User[] = [
+    {
+      "id": 701,
+      "name": "Maya Admin",
+      "role": "admin",
+      "collegeId": 17,
+      "email": "admin@mailinator.com",
+      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+      "allowedBranches": ["Licensing", "Retirement"]
+    },
+    {
+      "id": 555,
+      "name": "College 88 Admin",
+      "role": "admin",
+      "collegeId": 88,
+      "email": "admin-88@mailinator.com",
+      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+      "allowedBranches": ["Licensing", "Retirement"]
+    },
+    {
+      "id": 501,
+      "name": "Dana Learner",
+      "email": "dana.learner@example.com",
+      "role": "student",
+      "collegeId": 17,
+      "permissions": ["enroll_requests_page"],
+      "allowedBranches": ["Licensing"]
+    },
+    {
+      "id": 666,
+      "name": "Lucifer Morningstar",
+      "email": "satan@hell.com",
+      "role": "lecturer",
+      "collegeId": 17,
+      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+      "allowedBranches": ["Licensing", "Legal", "Religion"]
+    },
+  ];
+
+  protected readonly selectedUser = signal<User>(this.testUsers[0]);
+
+  protected readonly currentUser = this.selectedUser;
+
+  protected readonly loadQueueOnUser = effect(() => {
+    this.queueService.loadQueue(this.selectedUser());
+  });
 
   protected readonly statusFilter = signal<'all' | 'pending' | 'approved' | 'rejected'>('all');
   protected readonly typeFilter = signal<'all' | 'course' | 'bundle'>('all');
@@ -49,13 +94,20 @@ export class App implements OnInit {
   });
 
   protected readonly approve = (id: number): void => {
-    const resolvedBy = this.user()?.name ?? 'System';
+    const resolvedBy = this.selectedUser().name;
     this.queueService.updateRequestStatus(id, 'approved', resolvedBy);
   };
 
   protected readonly reject = (id: number): void => {
-    const resolvedBy = this.user()?.name ?? 'System';
+    const resolvedBy = this.selectedUser().name;
     this.queueService.updateRequestStatus(id, 'rejected', resolvedBy);
+  };
+
+  protected readonly setSelectedUser = (userId: string | number): void => {
+    const selected = this.testUsers.find((user) => user.id === Number(userId));
+    if (selected) {
+      this.selectedUser.set(selected);
+    }
   };
 
   protected readonly viewDetails = (id: number): void => {
@@ -63,9 +115,6 @@ export class App implements OnInit {
     console.log('View enrolment request', id);
   };
 
-  ngOnInit(): void {
-    this.userService.loadUser();
-    this.queueService.loadQueue();
-  }
+  ngOnInit(): void {}
 }
 

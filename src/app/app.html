@@ -39,6 +39,7 @@
           [attr.data-request-id]="request.id"
           *ngFor="let request of filteredQueue()"
           [request]="request"
+          [currentCollegeId]="selectedUser().collegeId"
           (approve)="approve($event)"
           (reject)="reject($event)"
           (view)="viewDetails($event)">
@@ -53,12 +54,30 @@
     </ng-template>
 
     <div class="panel-footer" data-test="footer-counts">
-      Total <span data-test="count-total">{{visibleStats().total}}</span>
-      | Pending <span data-test="count-pending">{{visibleStats().pending}}</span>
-      | Approved <span data-test="count-approved">{{visibleStats().approved}}</span>
-      | Rejected <span data-test="count-rejected">{{visibleStats().rejected}}</span>
-      | Course <span data-test="count-course">{{visibleStats().course}}</span>
-      | Bundle <span data-test="count-bundle">{{visibleStats().bundle}}</span>
+      <div class="footer-pill">
+        <span class="footer-label">Total</span>
+        <span class="footer-value" data-test="count-total">{{visibleStats().total}}</span>
+      </div>
+      <div class="footer-pill">
+        <span class="footer-label">Pending</span>
+        <span class="footer-value" data-test="count-pending">{{visibleStats().pending}}</span>
+      </div>
+      <div class="footer-pill">
+        <span class="footer-label">Approved</span>
+        <span class="footer-value" data-test="count-approved">{{visibleStats().approved}}</span>
+      </div>
+      <div class="footer-pill">
+        <span class="footer-label">Rejected</span>
+        <span class="footer-value" data-test="count-rejected">{{visibleStats().rejected}}</span>
+      </div>
+      <div class="footer-pill">
+        <span class="footer-label">Course</span>
+        <span class="footer-value" data-test="count-course">{{visibleStats().course}}</span>
+      </div>
+      <div class="footer-pill">
+        <span class="footer-label">Bundle</span>
+        <span class="footer-value" data-test="count-bundle">{{visibleStats().bundle}}</span>
+      </div>
     </div>
   </ng-container>
 
@@ -69,16 +88,39 @@
 
 <div class="panel">
   <h1>Current User</h1>
-  <div class="panel-body" *ngIf="user() !== null">
-    <!-- TODO move to separate component? -->
-    Id: {{user()?.id}}
-    Name: {{user()?.name}}
+  <div class="filters">
+    <div class="filter-control">
+      <label for="user-select">Fake user</label>
+      <select
+        id="user-select"
+        data-test="user-select"
+        [value]="selectedUser().id"
+        (change)="setSelectedUser($any($event.target).value)">
+        <option *ngFor="let user of testUsers" [value]="user.id">
+          {{ user.role }} — {{ user.name }}
+        </option>
+      </select>
+    </div>
+  </div>
 
-    Role: {{user()?.role}}
-    <div>
-      Permissions: {{user()?.permissions?.join(',')}}
-      Allowed Branches: {{user()?.allowedBranches?.join(',')}}
+  <div class="panel-body user-card">
+    <div class="user-card-heading">
+      <div>
+        <div class="user-card-title">{{ selectedUser().name }}</div>
+        <div class="user-card-subtitle">Id: {{ selectedUser().id }}</div>
+      </div>
+      <span class="badge badge-type">{{ selectedUser().role || 'Guest' }}</span>
     </div>
 
+    <div class="user-card-meta">
+      <div class="meta-row">
+        <span class="meta-label">Permissions</span>
+        <span class="meta-value">{{ selectedUser().permissions.join(', ') }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Allowed Branches</span>
+        <span class="meta-value">{{ selectedUser().allowedBranches.join(', ') }}</span>
+      </div>
+    </div>
   </div>
 </div>

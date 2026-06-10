@@ -11,6 +11,7 @@ import { Request } from '../enrolment-queue.service';
 })
 export class RequestItem {
   readonly request = input<Request>();
+  readonly currentCollegeId = input<number>();
   readonly approve = output<number>();
   readonly reject = output<number>();
   readonly view = output<number>();

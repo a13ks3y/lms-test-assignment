@@ -1,5 +1,6 @@
 import { Injectable, inject, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { User} from './user.service';
 
 export interface Requester {
   id: number;
@@ -24,7 +25,7 @@ export interface Request {
   resolvedAt?: string;
   resolvedBy?: string;
   rejectionReason?: string;
-  adminNote?: string;
+  adminNote?: string | null;
 }
 
 export interface QueueStats {
@@ -86,13 +87,17 @@ export class EnrolmentQueueService {
     );
   }
 
-  loadQueue(): void {
+  loadQueue(user: User): void {
     const dataUrl = './data.json';
     this.http
       .get<{ requests?: Request[] }>(dataUrl)
       .subscribe({
         next: (data) => {
-          this.requests.set(data.requests ?? []);
+          const alteredRequests: Request[] = (data.requests ?? []).map(request => ({
+            ...request,
+            adminNote: user.role === 'admin' ? request.adminNote : null,
+          }));
+          this.requests.set(alteredRequests);
           this.loaded.set(true);
         },
         error: (error) => {

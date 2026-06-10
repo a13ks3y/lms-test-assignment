@@ -39,6 +39,18 @@ test.describe('Enrollment queue', () => {
     await expect(page.locator('[data-test="count-pending"]')).toHaveText(String(pendingBefore - 1));
   });
 
+  test('blocks approval/rejection for cross-college requests', async ({ page }) => {
+    await page.locator('[data-test="user-select"]').selectOption('501');
+    const crossCollegeRow = page.locator('li[app-request-item][data-request-id="9006"]');
+
+    await expect(crossCollegeRow).toBeVisible();
+    await expect(crossCollegeRow.locator('button', { hasText: 'Approve' })).toBeDisabled();
+    await expect(crossCollegeRow.locator('button', { hasText: 'Reject' })).toBeDisabled();
+    await expect(crossCollegeRow.locator('.request-warning')).toHaveText(
+      'This request belongs to a different college and cannot be approved or rejected.',
+    );
+  });
+
   test('shows empty state when filters match no requests', async ({ page }) => {
     await page.locator('[data-test="status-filter"]').selectOption('approved');
     await page.locator('[data-test="branch-filter"]').selectOption('Health');
