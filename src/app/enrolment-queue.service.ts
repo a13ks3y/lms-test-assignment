@@ -69,6 +69,21 @@ export class EnrolmentQueueService {
     return stats;
   });
 
+  updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedBy?: string): void {
+    this.requests.update(requests =>
+      requests.map(request =>
+        request.id === id
+          ? {
+              ...request,
+              status,
+              resolvedAt: new Date().toISOString(),
+              resolvedBy: resolvedBy ?? request.resolvedBy,
+            }
+          : request,
+      ),
+    );
+  }
+
   loadQueue(): void {
     const dataUrl = './data.json';
     this.http

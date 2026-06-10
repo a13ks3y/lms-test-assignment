@@ -1,0 +1,38 @@
+<ng-container *ngIf="request() as requestData">
+  <li [class]="requestData.type">
+    <div class="request-title">
+      {{ requestData.target.title }}
+    </div>
+    <div class="request-summary">
+      <span class="request-id">#{{ requestData.id }}</span>
+      <span class="badge badge-status status-{{ requestData.status }}">{{ requestData.status | titlecase }}</span>
+      <span class="badge badge-type">{{ requestData.type | titlecase }}</span>
+      <span class="badge badge-branch">{{ requestData.branch }}</span>
+      <span class="badge badge-payment-state state-{{requestData.paymentState}}">&dollar; {{ requestData.paymentState | FormatPaymentStatus }}</span>
+    </div>
+
+    <div class="request-meta">
+      <div>Submitted: {{ requestData.submittedAt | date: 'medium' }}</div>
+      <div class="person-info person-info-requester">
+        <div>Name: {{ requestData.requester.name }}</div>
+        <div>Email: {{ requestData.requester.email }}</div>
+      </div>
+    </div>
+
+    <div class="request-note" *ngIf="requestData.adminNote">
+      {{ requestData.adminNote }}
+    </div>
+
+    <div class="request-actions">
+      <button type="button" class="btn-approve" (click)="approve.emit(requestData.id)" [disabled]="requestData.status !== 'pending'">
+        Approve
+      </button>
+      <button type="button" class="btn-reject" (click)="reject.emit(requestData.id)" [disabled]="requestData.status !== 'pending'">
+        Reject
+      </button>
+      <button type="button" class="btn-view" (click)="view.emit(requestData.id)">
+        View
+      </button>
+    </div>
+  </li>
+</ng-container>

@@ -2,15 +2,13 @@
   <h1>Enrolment Request Queue</h1>
   <ng-container *ngIf="queue().length > 0; else loading">
     <ul class="panel-body">
-      <li *ngFor="let request of queue()" [class]="request.type">
-        Id: {{request.id}}
-        Submitted: {{request.submittedAt | date:'medium'}}
-        <div class="person-info person-info-requester">
-          <!-- TODO move to separate component? -->
-          Name: {{request.requester.name}}
-          Email: {{request.requester.email}}
-        </div>
-      </li>
+      <app-request-item
+        *ngFor="let request of queue()"
+        [request]="request"
+        (approve)="approve($event)"
+        (reject)="reject($event)"
+        (view)="viewDetails($event)">
+      </app-request-item>
     </ul>
     <div class="panel-footer">
       Total {{stats().total}} | Pending {{stats().pending}} | Approved {{stats().approved}} | Rejected {{stats().rejected}} | Course {{stats().course}} | Bundle {{stats().bundle}}

@@ -7,6 +7,24 @@
     "permissions": ["enroll_requests_page", "enroll_requests_approve"],
     "allowedBranches": ["Licensing", "Retirement"]
   },
+  "studentUser": {
+    "id": 501,
+    "name": "Dana Learner",
+    "email": "dana.learner@example.com",
+    "role": "student",
+    "collegeId": 17,
+    "permissions": ["enroll_requests_page"],
+    "allowedBranches": ["Licensing"]
+  },
+  "lecturerUser": {
+    "id": 666,
+    "name": "Lucifer Morningstar",
+    "email": "satan@hell.com",
+    "role": "lecturer",
+    "collegeId": 17,
+    "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+    "allowedBranches": ["Licensing", "Legal", "Religion"]
+  },
   "requests": [
     {
       "id": 9001,
