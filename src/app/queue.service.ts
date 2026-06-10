@@ -38,7 +38,7 @@ export interface QueueStats {
 }
 
 @Injectable({ providedIn: 'root' })
-export class EnrolmentQueueService {
+export class QueueService {
   private readonly http = inject(HttpClient);
   private readonly requests = signal<Request[]>([]);
   private readonly loaded = signal(false);
@@ -72,7 +72,7 @@ export class EnrolmentQueueService {
     return stats;
   });
 
-  updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedBy?: string): void {
+  updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedBy?: string, rejectionReason?: string): void {
     this.requests.update(requests =>
       requests.map(request =>
         request.id === id
@@ -81,6 +81,7 @@ export class EnrolmentQueueService {
               status,
               resolvedAt: new Date().toISOString(),
               resolvedBy: resolvedBy ?? request.resolvedBy,
+              rejectionReason: status === 'rejected' ? rejectionReason : undefined,
             }
           : request,
       ),

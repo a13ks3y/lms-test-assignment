@@ -23,28 +23,31 @@
       Note: {{ requestData.adminNote }}
     </div>
 
-    <div class="request-warning" *ngIf="requestData.collegeId !== currentCollegeId()">
-      This request belongs to a different college and cannot be approved or rejected.
-    </div>
-
     <div class="request-actions">
       <button
         type="button"
         class="btn-approve"
         (click)="approve.emit(requestData.id)"
-        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId()">
+        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))">
         Approve
       </button>
       <button
         type="button"
         class="btn-reject"
         (click)="reject.emit(requestData.id)"
-        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId()">
+        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))">
         Reject
       </button>
-      <button type="button" class="btn-view" (click)="view.emit(requestData.id)">
-        View
-      </button>
+      <div
+        class="request-warning"
+        *ngIf="requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))">
+        <ng-container *ngIf="requestData.collegeId !== currentCollegeId(); else branchWarning">
+          This request belongs to a different college and cannot be approved or rejected.
+        </ng-container>
+        <ng-template #branchWarning>
+          This request belongs to a branch outside your allowed admin scope and cannot be approved or rejected.
+        </ng-template>
+      </div>
     </div>
 </ng-container>
 

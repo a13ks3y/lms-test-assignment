@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { EnrolmentQueueService, Request } from './enrolment-queue.service';
+import { EnrolmentQueueService, Request } from './queue.service';
 import { User } from './user.service';
 
 describe('EnrolmentQueueService', () => {

@@ -32,6 +32,9 @@ test.describe('Enrollment queue', () => {
 
     await expect(selectedRow.locator('button', { hasText: 'Approve' })).toBeEnabled();
     await selectedRow.locator('button', { hasText: 'Approve' }).click();
+    await expect(page.locator('[data-test="modal-confirm"]')).toBeVisible();
+    await page.locator('[data-test="modal-confirm"]').click();
+
     await expect(selectedRow.locator('.badge-status')).toHaveText('Approved');
     await expect(selectedRow.locator('button', { hasText: 'Approve' })).toBeDisabled();
 
@@ -48,6 +51,18 @@ test.describe('Enrollment queue', () => {
     await expect(crossCollegeRow.locator('button', { hasText: 'Reject' })).toBeDisabled();
     await expect(crossCollegeRow.locator('.request-warning')).toHaveText(
       'This request belongs to a different college and cannot be approved or rejected.',
+    );
+  });
+
+  test('blocks approval/rejection for out-of-scope branches', async ({ page }) => {
+    await page.locator('[data-test="user-select"]').selectOption('701');
+    const branchDeniedRow = page.locator('li[app-request-item][data-request-id="9005"]');
+
+    await expect(branchDeniedRow).toBeVisible();
+    await expect(branchDeniedRow.locator('button', { hasText: 'Approve' })).toBeDisabled();
+    await expect(branchDeniedRow.locator('button', { hasText: 'Reject' })).toBeDisabled();
+    await expect(branchDeniedRow.locator('.request-warning')).toHaveText(
+      'This request belongs to a branch outside your allowed admin scope and cannot be approved or rejected.',
     );
   });
 

@@ -40,9 +40,9 @@
           *ngFor="let request of filteredQueue()"
           [request]="request"
           [currentCollegeId]="selectedUser().collegeId"
+          [currentAllowedBranches]="selectedUser().allowedBranches"
           (approve)="approve($event)"
-          (reject)="reject($event)"
-          (view)="viewDetails($event)">
+          (reject)="reject($event)">
         </li>
       </ul>
     </ng-container>
@@ -84,6 +84,45 @@
   <ng-template #loading>
     <div class="spinner">Loading queue...</div>
   </ng-template>
+
+  <div
+    class="modal-backdrop"
+    *ngIf="modalAction() !== null && modalRequest() as activeRequest"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    aria-describedby="modal-description">
+    <div class="modal-card">
+      <h2 id="modal-title">
+        {{ modalAction() === 'reject' ? 'Confirm rejection' : 'Confirm approval' }}
+      </h2>
+
+      <p id="modal-description">
+        Are you sure you want to
+        {{ modalAction() === 'reject' ? 'reject' : 'approve' }}
+        request #{{ activeRequest.id }} for "{{ activeRequest.target.title }}"?
+      </p>
+
+      <ng-container *ngIf="modalAction() === 'reject'">
+        <label for="reject-reason">Rejection reason</label>
+        <textarea
+          id="reject-reason"
+          data-test="reject-reason"
+          [value]="modalReason()"
+          (input)="modalReason.set($any($event.target).value)"
+          rows="4"
+          placeholder="Enter reason for rejection"></textarea>
+        <p class="field-error" *ngIf="modalError()">{{ modalError() }}</p>
+      </ng-container>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="cancelModal()">Cancel</button>
+        <button type="button" class="btn-approve" (click)="confirmModal()" data-test="modal-confirm">
+          {{ modalAction() === 'reject' ? 'Reject request' : 'Approve request' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="panel">

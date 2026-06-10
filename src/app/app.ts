@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
-import { EnrolmentQueueService } from './enrolment-queue.service';
+import { QueueService } from './queue.service';
 import { RequestItem } from './request-item/request-item';
 import { User } from './user.service';
 
@@ -11,10 +11,9 @@ import { User } from './user.service';
   styleUrls: ['./app.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App implements OnInit {
-  protected readonly queueService = inject(EnrolmentQueueService);
+export class App {
+  protected readonly queueService = inject(QueueService);
   protected readonly queue = this.queueService.queue;
-  protected readonly stats = this.queueService.stats;
   protected readonly isLoaded = this.queueService.isLoaded;
 
   protected readonly testUsers: User[] = [
@@ -57,8 +56,14 @@ export class App implements OnInit {
   ];
 
   protected readonly selectedUser = signal<User>(this.testUsers[0]);
+  protected readonly modalAction = signal<'approve' | 'reject' | null>(null);
+  protected readonly modalRequestId = signal<number | null>(null);
+  protected readonly modalReason = signal('');
+  protected readonly modalError = signal<string | null>(null);
 
-  protected readonly currentUser = this.selectedUser;
+  protected readonly modalRequest = computed(() =>
+    this.queue().find((request) => request.id === this.modalRequestId()),
+  );
 
   protected readonly loadQueueOnUser = effect(() => {
     this.queueService.loadQueue(this.selectedUser());
@@ -94,13 +99,48 @@ export class App implements OnInit {
   });
 
   protected readonly approve = (id: number): void => {
-    const resolvedBy = this.selectedUser().name;
-    this.queueService.updateRequestStatus(id, 'approved', resolvedBy);
+    this.openActionModal('approve', id);
   };
 
   protected readonly reject = (id: number): void => {
-    const resolvedBy = this.selectedUser().name;
-    this.queueService.updateRequestStatus(id, 'rejected', resolvedBy);
+    this.openActionModal('reject', id);
+  };
+
+  protected readonly openActionModal = (action: 'approve' | 'reject', requestId: number): void => {
+    this.modalAction.set(action);
+    this.modalRequestId.set(requestId);
+    this.modalReason.set('');
+    this.modalError.set(null);
+  };
+
+  protected readonly cancelModal = (): void => {
+    this.modalAction.set(null);
+    this.modalRequestId.set(null);
+    this.modalReason.set('');
+    this.modalError.set(null);
+  };
+
+  protected readonly confirmModal = (): void => {
+    const action = this.modalAction();
+    const request = this.modalRequest();
+
+    if (!action || !request) {
+      this.cancelModal();
+      return;
+    }
+
+    if (action === 'reject') {
+      const reason = this.modalReason().trim();
+      if (!reason) {
+        this.modalError.set('Rejection reason is required.');
+        return;
+      }
+      this.queueService.updateRequestStatus(request.id, 'rejected', this.selectedUser().name, reason);
+    } else {
+      this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser().name);
+    }
+
+    this.cancelModal();
   };
 
   protected readonly setSelectedUser = (userId: string | number): void => {
@@ -111,7 +151,6 @@ export class App implements OnInit {
   };
 
   protected readonly viewDetails = (id: number): void => {
-    // todo: route to /request/id or show popup or just open details drawer?
     console.log('View enrolment request', id);
   };
 
