@@ -1,0 +1,181 @@
+{
+  "currentUser": {
+    "id": 701,
+    "name": "Maya Admin",
+    "role": "admin",
+    "collegeId": 17,
+    "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+    "allowedBranches": ["Licensing", "Retirement"]
+  },
+  "requests": [
+    {
+      "id": 9001,
+      "type": "course",
+      "status": "pending",
+      "collegeId": 17,
+      "branch": "Licensing",
+      "submittedAt": "2026-06-04T09:15:00Z",
+      "source": "course_page",
+      "paymentState": "not_required",
+      "requester": {
+        "id": 501,
+        "name": "Dana Learner",
+        "email": "dana.learner@example.com"
+      },
+      "target": {
+        "id": 2401,
+        "title": "Insurance Licensing Basics"
+      },
+      "adminNote": null
+    },
+    {
+      "id": 9002,
+      "type": "bundle",
+      "status": "pending",
+      "collegeId": 17,
+      "branch": "Retirement",
+      "submittedAt": "2026-06-05T11:40:00Z",
+      "source": "admin_invite",
+      "paymentState": "paid",
+      "requester": {
+        "id": 502,
+        "name": "Noam Cohen",
+        "email": "noam.cohen@example.com"
+      },
+      "target": {
+        "id": 3301,
+        "title": "Retirement Planning Bundle"
+      },
+      "adminNote": "Employer prepaid this learner."
+    },
+    {
+      "id": 9003,
+      "type": "course",
+      "status": "approved",
+      "collegeId": 17,
+      "branch": "Licensing",
+      "submittedAt": "2026-06-02T14:05:00Z",
+      "resolvedAt": "2026-06-03T08:20:00Z",
+      "resolvedBy": "Maya Admin",
+      "source": "support",
+      "paymentState": "not_required",
+      "requester": {
+        "id": 503,
+        "name": "Rina Levi",
+        "email": "rina.levi@example.com"
+      },
+      "target": {
+        "id": 2402,
+        "title": "Medical Underwriting"
+      },
+      "adminNote": "Approved after phone verification."
+    },
+    {
+      "id": 9004,
+      "type": "course",
+      "status": "rejected",
+      "collegeId": 17,
+      "branch": "Retirement",
+      "submittedAt": "2026-06-01T16:30:00Z",
+      "resolvedAt": "2026-06-02T10:10:00Z",
+      "resolvedBy": "Maya Admin",
+      "rejectionReason": "Missing employer approval.",
+      "source": "course_page",
+      "paymentState": "not_required",
+      "requester": {
+        "id": 504,
+        "name": "Eli Bar",
+        "email": "eli.bar@example.com"
+      },
+      "target": {
+        "id": 2403,
+        "title": "Practicum Retirement 2026"
+      },
+      "adminNote": null
+    },
+    {
+      "id": 9005,
+      "type": "bundle",
+      "status": "pending",
+      "collegeId": 17,
+      "branch": "Health",
+      "submittedAt": "2026-06-06T07:55:00Z",
+      "source": "coupon",
+      "paymentState": "pending",
+      "requester": {
+        "id": 505,
+        "name": "Shai Mor",
+        "email": "shai.mor@example.com"
+      },
+      "target": {
+        "id": 3302,
+        "title": "Health Insurance Bundle"
+      },
+      "adminNote": "Branch is outside current admin scope."
+    },
+    {
+      "id": 9006,
+      "type": "course",
+      "status": "pending",
+      "collegeId": 88,
+      "branch": "Licensing",
+      "submittedAt": "2026-06-06T12:25:00Z",
+      "source": "course_page",
+      "paymentState": "not_required",
+      "requester": {
+        "id": 506,
+        "name": "Cross College User",
+        "email": "cross.user@example.com"
+      },
+      "target": {
+        "id": 9901,
+        "title": "External College Course"
+      },
+      "adminNote": "Different college. Actions must be disabled."
+    },
+    {
+      "id": 9007,
+      "type": "bundle",
+      "status": "approved",
+      "collegeId": 17,
+      "branch": "Retirement",
+      "submittedAt": "2026-05-30T08:00:00Z",
+      "resolvedAt": "2026-05-31T09:30:00Z",
+      "resolvedBy": "System",
+      "source": "payment_webhook",
+      "paymentState": "paid",
+      "requester": {
+        "id": 507,
+        "name": "Lior Shahar",
+        "email": "lior.shahar@example.com"
+      },
+      "target": {
+        "id": 3303,
+        "title": "Pension Final Exam Bundle"
+      },
+      "adminNote": "Auto-approved after payment."
+    }
+  ],
+  "sampleActions": [
+    {
+      "requestId": 9001,
+      "action": "approve"
+    },
+    {
+      "requestId": 9002,
+      "action": "reject",
+      "reason": "Learner chose another bundle."
+    },
+    {
+      "requestId": 9005,
+      "action": "approve",
+      "expectedResult": "denied_branch_scope"
+    },
+    {
+      "requestId": 9006,
+      "action": "approve",
+      "expectedResult": "denied_college_scope"
+    }
+  ]
+}
+

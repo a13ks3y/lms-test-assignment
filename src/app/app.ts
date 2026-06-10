@@ -1,12 +1,25 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
+import { EnrolmentQueueService } from './enrolment-queue.service';
+import { UserService } from './user.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [NgIf, NgFor, DatePipe],
   templateUrl: './app.html',
-  styleUrl: './app.css',
+  styleUrls: ['./app.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  protected readonly title = signal('lms');
+export class App implements OnInit {
+  protected readonly queueService = inject(EnrolmentQueueService);
+  protected readonly userService = inject(UserService);
+  protected readonly queue = this.queueService.queue;
+  protected readonly stats = this.queueService.stats;
+  protected readonly user = this.userService.user;
+
+  ngOnInit(): void {
+    this.userService.loadUser();
+    this.queueService.loadQueue();
+  }
 }
+
