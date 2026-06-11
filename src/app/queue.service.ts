@@ -72,7 +72,7 @@ export class QueueService {
     return stats;
   });
 
-  updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedBy?: string, rejectionReason?: string): void {
+  updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedByUser?: User, rejectionReason?: string): void {
     this.requests.update(requests =>
       requests.map(request =>
         request.id === id
@@ -80,7 +80,7 @@ export class QueueService {
               ...request,
               status,
               resolvedAt: new Date().toISOString(),
-              resolvedBy: resolvedBy ?? request.resolvedBy,
+              resolvedBy: resolvedByUser?.name ?? request.resolvedBy,
               rejectionReason: status === 'rejected' ? rejectionReason : undefined,
             }
           : request,

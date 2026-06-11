@@ -18,13 +18,13 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, lms');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Enrolment Request Queue');
   });
 
   it('should start with Admin User selected', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     expect(app['selectedUser']()?.role).toBe('admin');
-    expect(app['selectedUser']()?.name).toBe('Admin User');
+    expect(app['selectedUser']()?.name).toBe('Maya Admin');
   });
 });

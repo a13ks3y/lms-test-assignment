@@ -135,9 +135,9 @@ export class App {
         this.modalError.set('Rejection reason is required.');
         return;
       }
-      this.queueService.updateRequestStatus(request.id, 'rejected', this.selectedUser().name, reason);
+      this.queueService.updateRequestStatus(request.id, 'rejected', this.selectedUser(), reason);
     } else {
-      this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser().name);
+      this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser());
     }
 
     this.cancelModal();

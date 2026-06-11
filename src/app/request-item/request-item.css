@@ -13,11 +13,11 @@ ul.panel-body li {
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
   margin: 0;
   padding: 1.25rem;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  transition: border-radius 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 ul.panel-body li:hover {
-  transform: translateY(-2px);
+  border-radius: 0.85rem;
   border-color: #4b5972;
   box-shadow: 0 18px 35px rgba(0, 0, 0, 0.45);
 }
@@ -119,19 +119,20 @@ ul.panel-body li:hover {
   padding: 0.75rem 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease;
 }
 
 .request-actions button:hover:not(:disabled) {
-  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(15, 118, 110, 0.25);
 }
 
 .request-warning {
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
+  margin-top: 0.9rem;
   padding: 0.9rem 1rem;
   border-radius: 1rem;
   background: rgba(248, 113, 113, 0.14);
-  color: #fecaca;
+  color: #fecaca; /* Phe-ka-ka lol */
   border: 1px solid rgba(248, 113, 113, 0.24);
   font-size: 0.92rem;
 }

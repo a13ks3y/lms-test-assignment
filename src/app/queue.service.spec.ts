@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { EnrolmentQueueService, Request } from './queue.service';
+import { QueueService, Request } from './queue.service';
 import { User } from './user.service';
 
-describe('EnrolmentQueueService', () => {
-  let service: EnrolmentQueueService;
+describe('QueueService', () => {
+  let service: QueueService;
   let httpMock: HttpTestingController;
 
   const adminUser: User = {
@@ -12,6 +12,7 @@ describe('EnrolmentQueueService', () => {
     name: 'Admin User',
     email: 'admin@example.com',
     role: 'admin',
+    collegeId: 17,
     permissions: ['manage'],
     allowedBranches: ['Science'],
   };
@@ -21,6 +22,7 @@ describe('EnrolmentQueueService', () => {
     name: 'Student User',
     email: 'student@example.com',
     role: 'student',
+    collegeId: 17,
     permissions: ['view'],
     allowedBranches: ['Arts'],
   };
@@ -49,10 +51,10 @@ describe('EnrolmentQueueService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EnrolmentQueueService],
+      providers: [QueueService],
     });
 
-    service = TestBed.inject(EnrolmentQueueService);
+    service = TestBed.inject(QueueService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -76,5 +78,9 @@ describe('EnrolmentQueueService', () => {
     request.flush({ requests: [sampleRequest] });
 
     expect(service.queue()[0].adminNote).toBeNull();
+  });
+  it('updateRequestStatus should check user permissions', () => {
+    service.loadQueue(adminUser);
+    service.updateRequestStatus(9001, 'approved', )
   });
 });
