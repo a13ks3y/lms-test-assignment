@@ -72,7 +72,29 @@ export class QueueService {
     return stats;
   });
 
-  updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedByUser?: User, rejectionReason?: string): void {
+  async updateRequestStatus(id: number, status: 'approved' | 'rejected', resolvedByUser: User, rejectionReason?: string): Promise<string> {
+    const request = this.requests().find(r=>id === r.id);
+    if (!request) {
+      return `No request with id: #${id}`;
+    }
+
+    if (!resolvedByUser.allowedBranches.includes(request.branch)) {
+      return `User ${resolvedByUser.name} Do not allowed to approve or reject branch ${request.branch}`;
+    }
+    if (resolvedByUser.collegeId !== request.collegeId) {
+      return `Wrong college`;
+    }
+    if (status === 'approved') {
+      if (!resolvedByUser.permissions.includes('enroll_requests_approve')) {
+        return `User ${resolvedByUser.name} has no permission to approve requests`;
+      }
+    } else if (status === 'rejected') {
+      if (!resolvedByUser.permissions.includes('enroll_requests_reject')) {
+        return `User ${resolvedByUser.name} has no permission to reject requests`;
+      }
+    }
+
+
     this.requests.update(requests =>
       requests.map(request =>
         request.id === id
@@ -86,6 +108,7 @@ export class QueueService {
           : request,
       ),
     );
+    return 'OK';
   }
 
   loadQueue(user: User): void {

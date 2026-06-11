@@ -13,8 +13,8 @@ describe('QueueService', () => {
     email: 'admin@example.com',
     role: 'admin',
     collegeId: 17,
-    permissions: ['manage'],
-    allowedBranches: ['Science'],
+    permissions: ["enroll_requests_page", "enroll_requests_approve"],
+    allowedBranches: ["Science", "Licensing", "Retirement"],
   };
 
   const studentUser: User = {
@@ -24,14 +24,54 @@ describe('QueueService', () => {
     role: 'student',
     collegeId: 17,
     permissions: ['view'],
-    allowedBranches: ['Arts'],
+    allowedBranches: ['Science'],
   };
 
   const sampleRequest: Request = {
     id: 1,
     type: 'course',
     status: 'pending',
-    collegeId: 42,
+    collegeId: 17,
+    branch: 'Science',
+    submittedAt: '2026-06-10T00:00:00.000Z',
+    source: 'web',
+    paymentState: 'paid',
+    requester: {
+      id: 10,
+      name: 'Alice',
+      email: 'alice@example.com',
+    },
+    target: {
+      id: 100,
+      title: 'Introduction to Testing',
+    },
+    adminNote: 'Urgent request',
+  };
+  const branchMismatchRequest: Request = {
+    id: 2,
+    type: 'course',
+    status: 'pending',
+    collegeId: 17,
+    branch: 'Healthcare',
+    submittedAt: '2026-06-10T00:00:00.000Z',
+    source: 'web',
+    paymentState: 'paid',
+    requester: {
+      id: 10,
+      name: 'Alice',
+      email: 'alice@example.com',
+    },
+    target: {
+      id: 100,
+      title: 'Introduction to Testing',
+    },
+    adminNote: 'Urgent request',
+  };
+const collegeMismatchRequest: Request = {
+    id: 3,
+    type: 'course',
+    status: 'pending',
+    collegeId: 88,
     branch: 'Science',
     submittedAt: '2026-06-10T00:00:00.000Z',
     source: 'web',
@@ -79,8 +119,40 @@ describe('QueueService', () => {
 
     expect(service.queue()[0].adminNote).toBeNull();
   });
-  it('updateRequestStatus should check user permissions', () => {
+  it('updateRequestStatus should check user permissions', async () => {
+    let status;
     service.loadQueue(adminUser);
-    service.updateRequestStatus(9001, 'approved', )
+    const request = httpMock.expectOne('./data.json');
+    request.flush({ requests: [sampleRequest, branchMismatchRequest, collegeMismatchRequest ] });
+
+
+    status = await service.updateRequestStatus(1, 'approved', adminUser);
+    expect(service.queue()[0].status).toEqual('approved');
+    expect(status).toEqual('OK');
+
+    status = await service.updateRequestStatus(2, 'approved', adminUser);
+    expect(service.queue()[1].status).toEqual('pending');
+    expect(status).toEqual('User Admin User Do not allowed to approve or reject branch Healthcare');
+    status = await service.updateRequestStatus(3, 'approved', adminUser);
+    expect(service.queue()[2].status).toEqual('pending');
+    expect(status).toEqual('Wrong college');
+
+    status = await service.updateRequestStatus(-1, 'approved', adminUser);
+    expect(status).toEqual('No request with id: #-1');
+  });
+  it('updateRequest status should check user permissions 2, the last Jedie', async () => {
+    let status;
+    service.loadQueue(adminUser);
+    const request = httpMock.expectOne('./data.json');
+    request.flush({ requests: [sampleRequest, branchMismatchRequest, collegeMismatchRequest ] });
+
+    status = await service.updateRequestStatus(1, 'approved', studentUser);
+    expect(service.queue()[0].status).toEqual('pending');
+    expect(status).toEqual('User Student User has no permission to approve requests');
+
+    status = await service.updateRequestStatus(1, 'rejected', studentUser);
+    expect(service.queue()[0].status).toEqual('pending');
+    expect(status).toEqual('User Student User has no permission to reject requests');
+
   });
 });

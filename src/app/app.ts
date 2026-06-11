@@ -23,7 +23,7 @@ export class App {
       "role": "admin",
       "collegeId": 17,
       "email": "admin@mailinator.com",
-      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+      "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
       "allowedBranches": ["Licensing", "Retirement"]
     },
     {
@@ -120,7 +120,7 @@ export class App {
     this.modalError.set(null);
   };
 
-  protected readonly confirmModal = (): void => {
+  protected readonly confirmModal = async (): Promise<void> => {
     const action = this.modalAction();
     const request = this.modalRequest();
 
@@ -128,18 +128,22 @@ export class App {
       this.cancelModal();
       return;
     }
-
+    let status: string;
     if (action === 'reject') {
       const reason = this.modalReason().trim();
       if (!reason) {
         this.modalError.set('Rejection reason is required.');
         return;
       }
-      this.queueService.updateRequestStatus(request.id, 'rejected', this.selectedUser(), reason);
+      status = await this.queueService.updateRequestStatus(request.id, 'rejected', this.selectedUser(), reason);
     } else {
-      this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser());
+      status = await this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser());
     }
-
+    if (status !== 'OK') {
+      alert(status);
+    } else {
+      alert('✨🚀🥳');
+    }
     this.cancelModal();
   };
 

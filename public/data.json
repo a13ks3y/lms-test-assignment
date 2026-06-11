@@ -4,7 +4,7 @@
     "name": "Maya Admin",
     "role": "admin",
     "collegeId": 17,
-    "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+    "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
     "allowedBranches": ["Licensing", "Retirement"]
   },
   "studentUser": {

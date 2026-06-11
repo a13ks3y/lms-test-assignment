@@ -37,18 +37,18 @@
 
     <div class="request-actions">
       <!-- todo: move disabled logic to service (add requestData.canApprove and requestData.canReject bool fields)-->
+        <!-- [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))"> -->
       <button
         type="button"
         class="btn-approve"
-        (click)="approve.emit(requestData.id)"
-        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))">
+        (click)="approve.emit(requestData.id)">
         Approve
       </button>
+        <!-- [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))"> -->
       <button
         type="button"
         class="btn-reject"
-        (click)="reject.emit(requestData.id)"
-        [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))">
+        (click)="reject.emit(requestData.id)">
         Reject
       </button>
     </div>
