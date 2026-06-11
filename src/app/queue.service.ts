@@ -112,7 +112,7 @@ export class QueueService {
   }
 
   loadQueue(user: User): void {
-    const dataUrl = './data.json';
+    const dataUrl = './test_input.json';
     this.http
       .get<{ requests?: Request[] }>(dataUrl)
       .subscribe({

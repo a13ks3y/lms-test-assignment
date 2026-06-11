@@ -1,59 +1,187 @@
-# Lms
+# Yeda LMS - Enrollment Request Queue
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.14.
+A small admin-facing enrollment request queue built with **Angular 21** using standalone components, signals, and strict type safety.
 
-## Development server
+## What Was Implemented
 
-To start a local development server, run:
+1. **Queue UI & Display**
+   - Load enrollment requests from `test_input.json` via `HttpClient`
+   - Display requester info, request type (course/bundle), target title, branch, date, status, source, payment state, and admin notes
+   - Real-time filtered list with empty state
 
-```bash
-ng serve
+2. **Filtering & Counters**
+   - Filter by status (all, pending, approved, rejected)
+   - Filter by request type (all, course, bundle)
+   - Filter by branch (dynamically extracted from queue)
+   - Live counters for total, pending, approved, rejected, course, bundle—update with every filter change
+
+3. **Local Approve/Reject Actions**
+   - Modal confirmation workflow for approve and reject
+   - Rejection requires a reason
+   - Status updates propagate immediately to UI and counters
+   - Approved/rejected requests have action buttons hidden (not just disabled)
+
+4. **Permission Enforcement**
+   - Current admin can only act on requests from their own `collegeId`
+   - If `allowedBranches` is set, admin can only act on those branches
+   - Cross-college and out-of-scope branch requests show disabled action buttons with clear warnings
+   - Pending requests in scope show enabled, fully actionable buttons
+
+5. **Test Coverage**
+   - **Unit tests**: 9 passing (service logic, pipe, component inputs, queue operations)
+   - **E2E tests**: 5 passing (filters + counters, approve action, cross-college deny, branch-scope deny, empty state)
+   - Playwright browser automation with modern async/await flow
+
+## What Was Intentionally Skipped
+
+- Backend implementation (no persistence, no database)
+- Authentication/login flow
+- Real role/permission system beyond the fixture model
+- Payment provider integration
+- Salesforce integration
+- Email/notification delivery
+- Pixel-perfect UI design (focus on functionality and clarity)
+- Advanced state libraries (signals + computed are sufficient)
+- Database schema or migrations
+
+## Tech Stack & Rationale
+
+**Why Angular 21?**
+- Mature, well-tested framework with strong TypeScript integration
+- Modern standalone components eliminate boilerplate
+- Signals provide a cleaner, more performant alternative to RxJS for this use case
+- Strict type checking catches errors early
+- Excellent developer experience with CLI scaffolding and testing tools
+
+**Architecture Decisions:**
+- **Signals over RxJS**: Local component state is simpler with signals; no need for observable chains here
+- **Standalone Components**: Eliminated NgModules—cleaner, tree-shakeable, modern Angular 15+
+- **ChangeDetectionStrategy.OnPush**: Explicit, performant change detection
+- **Service-based state**: `QueueService` manages queue data; `UserService` provides user context
+- **Computed filters**: Reactive computed properties auto-update when filters change
+- **Modal inside root**: Simplifies wiring; avoids portal complexity for a small queue
+
+## AI Usage
+
+- **GitHub Copilot**: Used for code generation, test scaffolding, and refactoring suggestions
+- **Approach**: Reviewed all AI-generated code, tested incrementally, and refined logic after initial implementation
+- **Specific Changes**:
+  - Generated initial service method stubs; rewrote to include rejection reason
+  - Generated E2E test boilerplate; customized selectors and assertions
+  - Generated CSS; tuned for layout and dark theme
+  - Manually verified all state transitions and permission logic
+- **Ownership**: Every core decision (filtering logic, permission enforcement, action flow) was deliberate and tested
+
+## Backend Persistence & Authorization
+
+### How to Persist Approve/Reject Actions
+
+**POST /api/queue/requests/:id/action**
+```json
+{
+  "action": "approve" | "reject",
+  "approvedBy": "username",
+  "rejectionReason": "optional, required if action is reject"
+}
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**Response**: Updated request object with new status and `lastUpdatedAt` timestamp.
 
-## Code scaffolding
+### Backend Authorization Checks
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. **Authentication**: Verify JWT or session; extract `currentUser` context
+2. **College Scope**: 
+   - Check `request.collegeId === currentUser.collegeId`
+   - Return 403 Forbidden if mismatch
+3. **Branch Scope**: 
+   - If `currentUser.allowedBranches.length > 0`, verify `request.branch in currentUser.allowedBranches`
+   - Return 403 Forbidden if not allowed
+4. **Status Guard**: 
+   - Only allow approve/reject if `request.status === 'pending'`
+   - Return 409 Conflict if already processed
+5. **Idempotency**: 
+   - Accept `Idempotency-Key` header; check if action already processed
+   - Return 200 OK with cached result if duplicate detected (prevent double-charging, double-notifications)
 
-```bash
-ng generate component component-name
+### Duplicate Click Handling
+
+1. **Frontend**: Disable buttons immediately after click; prevent re-submission via modal confirmation
+2. **Backend**: 
+   - Use `Idempotency-Key` header (UUID from client)
+   - Store key + response in Redis/cache with 1-hour TTL
+   - Idempotent operation: same key = same result, no side effects
+3. **Database**: Use transaction to atomically update status + log action; constraints prevent race conditions
+
+### Example Backend Flow
+
+```
+Client Request:
+  POST /api/queue/requests/9001/action
+  { action: "approve", approvedBy: "Maya Admin", Idempotency-Key: "uuid-123" }
+
+Backend:
+  1. Verify JWT, extract user
+  2. Check cache: if uuid-123 exists, return cached response
+  3. Load request 9001
+  4. Verify: user.collegeId == request.collegeId ✓
+  5. Verify: user.allowedBranches includes request.branch ✓
+  6. Verify: request.status == "pending" ✓
+  7. Update status = "approved", lastUpdatedAt = now()
+  8. Log action (who, when, action type)
+  9. Store idempotency key in cache
+  10. Emit event for notifications (async queue)
+  11. Return 200 OK with updated request
+
+Retry (duplicate Idempotency-Key):
+  Backend returns cached response immediately; no DB write; no notification re-sent
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Development & Testing
 
+### Setup
 ```bash
-ng generate --help
+npm install
+npm start        # http://localhost:4200
+npm run test     # Unit tests (Vitest)
+npm run e2e      # E2E tests (Playwright)
+npm run build    # Production build
 ```
 
-## Building
+### Verification Checklist
 
-To build the project run:
+**Manual Checks:**
+- [ ] Load page; queue displays with all fields
+- [ ] Filters work independently and in combination
+- [ ] Counters update when filter changes
+- [ ] Click Approve on a pending request; confirm modal appears; confirm status changes and button disappears
+- [ ] Click Reject; modal asks for reason; if blank, error shown; with reason, status changes
+- [ ] Switch user to cross-college; buttons disabled with warning
+- [ ] Switch user with branch restriction; out-of-scope branches show disabled buttons with warning
 
+**Tests:**
 ```bash
-ng build
+npm run test     # 9 unit tests
+npm run e2e      # 5 E2E tests
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Known Limitations & Future Improvements
 
-## Running unit tests
+1. **Search**: No full-text search on requester name, email, or title—could add input filter
+2. **Sorting**: No column sorting; could add by date, status, branch
+3. **Pagination**: Loads entire queue; could paginate for large datasets
+4. **Undo**: No undo after approve/reject; could add with soft-delete or status-change log
+5. **Bulk Actions**: Only one at a time; could add select-all and batch approve/reject
+6. **Notifications**: No real-time updates from backend; could use WebSocket to sync changes
+7. **Analytics**: No logging of admin actions for audit trail; backend logs should persist these
+8. **Accessibility**: Should run full AXE audit and WCAG AA validation
+9. **Performance**: Currently no lazy loading; virtualization for 1000+ items would help
+10. **Error Handling**: No network retry logic; could add exponential backoff for transient failures
+11. "This request belongs to a different college and cannot be approved or rejected." message shows for approved/rejected status as well, not sure if it should be hidden
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Build & Deployment Notes
 
-```bash
-ng test
-```
+- CSS budget warning: `app.css` is ~330 bytes over 4 KB target (safe; remove unused styles to optimize)
+- No environment config; uses `./data.json` for all runs
+- Production build output: `dist/lms/`
+- Run `npm run build` for prod bundle
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

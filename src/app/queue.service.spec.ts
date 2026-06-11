@@ -105,7 +105,7 @@ const collegeMismatchRequest: Request = {
   it('requires a user and loads queue data', () => {
     service.loadQueue(adminUser);
 
-    const request = httpMock.expectOne('./data.json');
+    const request = httpMock.expectOne('./test_input.json');
     request.flush({ requests: [sampleRequest] });
 
     expect(service.queue()).toEqual([sampleRequest]);
@@ -114,7 +114,7 @@ const collegeMismatchRequest: Request = {
   it('masks adminNote for non-admin users', () => {
     service.loadQueue(studentUser);
 
-    const request = httpMock.expectOne('./data.json');
+    const request = httpMock.expectOne('./test_input.json');
     request.flush({ requests: [sampleRequest] });
 
     expect(service.queue()[0].adminNote).toBeNull();
@@ -122,7 +122,7 @@ const collegeMismatchRequest: Request = {
   it('updateRequestStatus should check user permissions', async () => {
     let status;
     service.loadQueue(adminUser);
-    const request = httpMock.expectOne('./data.json');
+    const request = httpMock.expectOne('./test_input.json');
     request.flush({ requests: [sampleRequest, branchMismatchRequest, collegeMismatchRequest ] });
 
 
@@ -143,7 +143,7 @@ const collegeMismatchRequest: Request = {
   it('updateRequest status should check user permissions 2, the last Jedie', async () => {
     let status;
     service.loadQueue(adminUser);
-    const request = httpMock.expectOne('./data.json');
+    const request = httpMock.expectOne('./test_input.json');
     request.flush({ requests: [sampleRequest, branchMismatchRequest, collegeMismatchRequest ] });
 
     status = await service.updateRequestStatus(1, 'approved', studentUser);

@@ -40,14 +40,14 @@
         type="button"
         class="btn-approve"
         (click)="approve.emit(requestData.id)"
-        [disabled]="canApprove(requestData)">
+        [disabled]="!canApprove(requestData)">
         Approve
       </button>
       <button
         type="button"
         class="btn-reject"
         (click)="reject.emit(requestData.id)"
-        [disabled]="canReject(requestData)">
+        [disabled]="!canReject(requestData)">
         Reject
       </button>
     </div>

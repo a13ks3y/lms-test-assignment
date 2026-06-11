@@ -4,6 +4,7 @@ import { QueueService } from './queue.service';
 import { RequestItem } from './request-item/request-item';
 import { User } from './user.service';
 
+
 @Component({
   selector: 'app-root',
   imports: [NgIf, NgFor, RequestItem],
@@ -60,6 +61,8 @@ export class App {
   protected readonly modalRequestId = signal<number | null>(null);
   protected readonly modalReason = signal('');
   protected readonly modalError = signal<string | null>(null);
+  protected readonly notificationMessage = signal<string | null>(null);
+  protected readonly notificationMessageType = signal<string>('info');
 
   protected readonly modalRequest = computed(() =>
     this.queue().find((request) => request.id === this.modalRequestId()),
@@ -128,6 +131,7 @@ export class App {
       this.cancelModal();
       return;
     }
+
     let status: string;
     if (action === 'reject') {
       const reason = this.modalReason().trim();
@@ -139,11 +143,13 @@ export class App {
     } else {
       status = await this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser());
     }
+
     if (status !== 'OK') {
-      alert(status);
+      this.notify(status, 'error');
     } else {
-      alert('✨🚀🥳');
+      this.notify('Success!');
     }
+
     this.cancelModal();
   };
 
@@ -156,6 +162,16 @@ export class App {
 
   protected readonly viewDetails = (id: number): void => {
     console.log('View enrolment request', id);
+  };
+  protected readonly notify = (message: string, messageType: string = 'info'): void => {
+    const timeout = messageType === 'error' ? 4800 : 2400;
+    this.notificationMessageType.set(messageType);
+    this.notificationMessage.set(message);
+    window.setTimeout(() => {
+      if (this.notificationMessage() === message) {
+        this.notificationMessage.set(null);
+      }
+    }, timeout);
   };
 
   ngOnInit(): void {}

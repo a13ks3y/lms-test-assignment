@@ -17,9 +17,9 @@ export class RequestItem {
   readonly reject = output<number>();
 
   canApprove(requestData: Request): boolean {
-    return requestData.status !== 'pending' || requestData.collegeId !== this.currentCollegeId() || (this.currentAllowedBranches().length > 0 && !this.currentAllowedBranches().includes(requestData.branch));
+    return !(requestData.status !== 'pending' || requestData.collegeId !== this.currentCollegeId() || (this.currentAllowedBranches().length > 0 && !this.currentAllowedBranches().includes(requestData.branch)));
   }
   canReject(requestData: Request): boolean {
-    return requestData.status !== 'pending' || requestData.collegeId !== this.currentCollegeId() || (this.currentAllowedBranches().length > 0 && !this.currentAllowedBranches().includes(requestData.branch));
+    return !(requestData.status !== 'pending' || requestData.collegeId !== this.currentCollegeId() || (this.currentAllowedBranches().length > 0 && !this.currentAllowedBranches().includes(requestData.branch)));
   }
 }

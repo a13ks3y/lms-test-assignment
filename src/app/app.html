@@ -1,3 +1,6 @@
+<div class="toast-banner toast-banner-{{notificationMessageType()}}" *ngIf="notificationMessage()">
+  {{ notificationMessage() }}
+</div>
 <div class="panel">
   <h1>Enrolment Request Queue</h1>
   <ng-container *ngIf="isLoaded(); else loading">
