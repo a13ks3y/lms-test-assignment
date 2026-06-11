@@ -35,20 +35,19 @@
       </ng-template>
     </div>
 
-    <div class="request-actions">
-      <!-- todo: move disabled logic to service (add requestData.canApprove and requestData.canReject bool fields)-->
-        <!-- [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))"> -->
+    <div class="request-actions" *ngIf="requestData.status === 'pending'">
       <button
         type="button"
         class="btn-approve"
-        (click)="approve.emit(requestData.id)">
+        (click)="approve.emit(requestData.id)"
+        [disabled]="canApprove(requestData)">
         Approve
       </button>
-        <!-- [disabled]="requestData.status !== 'pending' || requestData.collegeId !== currentCollegeId() || (currentAllowedBranches().length > 0 && !currentAllowedBranches().includes(requestData.branch))"> -->
       <button
         type="button"
         class="btn-reject"
-        (click)="reject.emit(requestData.id)">
+        (click)="reject.emit(requestData.id)"
+        [disabled]="canReject(requestData)">
         Reject
       </button>
     </div>

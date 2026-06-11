@@ -36,7 +36,7 @@ test.describe('Enrollment queue', () => {
     await page.locator('[data-test="modal-confirm"]').click();
 
     await expect(selectedRow.locator('.badge-status')).toHaveText('Approved');
-    await expect(selectedRow.locator('button', { hasText: 'Approve' })).toBeDisabled();
+    await expect(selectedRow.locator('button', { hasText: 'Approve' })).not.toBeVisible();
 
     await expect(page.locator('[data-test="count-approved"]')).toHaveText(String(approvedBefore + 1));
     await expect(page.locator('[data-test="count-pending"]')).toHaveText(String(pendingBefore - 1));
