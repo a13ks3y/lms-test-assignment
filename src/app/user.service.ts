@@ -15,16 +15,25 @@ export interface User {
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly http = inject(HttpClient);
+  readonly users = signal<User[]>([]);
   readonly user = signal<User | null>(null);
 
-  loadUser(): void {
-    const dataUrl = './data.json';
+  loadUsers(): void {
+    if (this.user() !== null) {
+      return;
+    }
+    const dataUrl = './test_input.json';
     this.http
-      .get<{ currentUser: User }>(dataUrl)
+      .get<{ currentUserId: number; users: User[] }>(dataUrl)
       .subscribe({
-        next: (data) => this.user.set(data.currentUser),
+        next: (data) => {
+          this.users.set(data.users || []);
+          const defaultUser = data.users?.find(u => u.id === data.currentUserId) || data.users?.[0] || null;
+          this.user.set(defaultUser);
+        },
         error: (error) => {
           console.error(`Error loading ${dataUrl}:`, error);
+          this.users.set([]);
           this.user.set(null);
         },
     });

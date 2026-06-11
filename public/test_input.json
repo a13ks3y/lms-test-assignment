@@ -1,30 +1,43 @@
 {
-  "currentUser": {
-    "id": 701,
-    "name": "Maya Admin",
-    "role": "admin",
-    "collegeId": 17,
-    "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
-    "allowedBranches": ["Licensing", "Retirement"]
-  },
-  "studentUser": {
-    "id": 501,
-    "name": "Dana Learner",
-    "email": "dana.learner@example.com",
-    "role": "student",
-    "collegeId": 17,
-    "permissions": ["enroll_requests_page"],
-    "allowedBranches": ["Licensing"]
-  },
-  "lecturerUser": {
-    "id": 666,
-    "name": "Lucifer Morningstar",
-    "email": "satan@hell.com",
-    "role": "lecturer",
-    "collegeId": 17,
-    "permissions": ["enroll_requests_page", "enroll_requests_approve"],
-    "allowedBranches": ["Licensing", "Legal", "Religion"]
-  },
+  "currentUserId": 701,
+  "users": [
+    {
+      "id": 701,
+      "name": "Maya Admin",
+      "role": "admin",
+      "collegeId": 17,
+      "email": "admin@mailinator.com",
+      "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
+      "allowedBranches": ["Licensing", "Retirement"]
+    },
+    {
+      "id": 555,
+      "name": "College 88 Admin",
+      "role": "admin",
+      "collegeId": 88,
+      "email": "admin-88@mailinator.com",
+      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+      "allowedBranches": ["Licensing", "Retirement"]
+    },
+    {
+      "id": 501,
+      "name": "Dana Learner",
+      "email": "dana.learner@example.com",
+      "role": "student",
+      "collegeId": 17,
+      "permissions": ["enroll_requests_page"],
+      "allowedBranches": ["Licensing"]
+    },
+    {
+      "id": 666,
+      "name": "Lucifer Morningstar",
+      "email": "satan@hell.com",
+      "role": "lecturer",
+      "collegeId": 17,
+      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
+      "allowedBranches": ["Licensing", "Legal", "Religion"]
+    }
+  ],
   "requests": [
     {
       "id": 9001,

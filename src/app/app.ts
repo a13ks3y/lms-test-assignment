@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { QueueService } from './queue.service';
+import { UserService } from './user.service';
 import { RequestItem } from './request-item/request-item';
 import { User } from './user.service';
 
@@ -14,49 +15,11 @@ import { User } from './user.service';
 })
 export class App {
   protected readonly queueService = inject(QueueService);
+  protected readonly userService = inject(UserService);
   protected readonly queue = this.queueService.queue;
   protected readonly isLoaded = this.queueService.isLoaded;
+  protected readonly users = this.userService.users;
 
-  protected readonly testUsers: User[] = [
-    {
-      "id": 701,
-      "name": "Maya Admin",
-      "role": "admin",
-      "collegeId": 17,
-      "email": "admin@mailinator.com",
-      "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
-      "allowedBranches": ["Licensing", "Retirement"]
-    },
-    {
-      "id": 555,
-      "name": "College 88 Admin",
-      "role": "admin",
-      "collegeId": 88,
-      "email": "admin-88@mailinator.com",
-      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
-      "allowedBranches": ["Licensing", "Retirement"]
-    },
-    {
-      "id": 501,
-      "name": "Dana Learner",
-      "email": "dana.learner@example.com",
-      "role": "student",
-      "collegeId": 17,
-      "permissions": ["enroll_requests_page"],
-      "allowedBranches": ["Licensing"]
-    },
-    {
-      "id": 666,
-      "name": "Lucifer Morningstar",
-      "email": "satan@hell.com",
-      "role": "lecturer",
-      "collegeId": 17,
-      "permissions": ["enroll_requests_page", "enroll_requests_approve"],
-      "allowedBranches": ["Licensing", "Legal", "Religion"]
-    },
-  ];
-
-  protected readonly selectedUser = signal<User>(this.testUsers[0]);
   protected readonly modalAction = signal<'approve' | 'reject' | null>(null);
   protected readonly modalRequestId = signal<number | null>(null);
   protected readonly modalReason = signal('');
@@ -69,7 +32,10 @@ export class App {
   );
 
   protected readonly loadQueueOnUser = effect(() => {
-    this.queueService.loadQueue(this.selectedUser());
+    const user = this.userService.user();
+    if (user) {
+      this.queueService.loadQueue(user);
+    }
   });
 
   protected readonly statusFilter = signal<'all' | 'pending' | 'approved' | 'rejected'>('all');
@@ -139,9 +105,13 @@ export class App {
         this.modalError.set('Rejection reason is required.');
         return;
       }
-      status = await this.queueService.updateRequestStatus(request.id, 'rejected', this.selectedUser(), reason);
+      const user = this.userService.user();
+      if (!user) return;
+      status = await this.queueService.updateRequestStatus(request.id, 'rejected', user, reason);
     } else {
-      status = await this.queueService.updateRequestStatus(request.id, 'approved', this.selectedUser());
+      const user = this.userService.user();
+      if (!user) return;
+      status = await this.queueService.updateRequestStatus(request.id, 'approved', user);
     }
 
     if (status !== 'OK') {
@@ -154,9 +124,9 @@ export class App {
   };
 
   protected readonly setSelectedUser = (userId: string | number): void => {
-    const selected = this.testUsers.find((user) => user.id === Number(userId));
+    const selected = this.users().find((user) => user.id === Number(userId));
     if (selected) {
-      this.selectedUser.set(selected);
+      this.userService.user.set(selected);
     }
   };
 
@@ -174,6 +144,19 @@ export class App {
     }, timeout);
   };
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
+  readonly selectedUser: Signal<User | null>;
+  constructor() {
+    this.userService.loadUsers();
+    this.selectedUser = this.userService.user;
+    effect(() => {
+      const defaultUser = this.userService.user();
+      if (defaultUser && !this.userService.user()) {
+        this.userService.user.set(defaultUser);
+      }
+    });
+
+  }
 }
 

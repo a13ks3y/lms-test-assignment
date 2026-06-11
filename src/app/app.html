@@ -3,6 +3,7 @@
 </div>
 <div class="panel">
   <h1>Enrolment Request Queue</h1>
+  Debug info: {{selectedUser()?.name}}
   <ng-container *ngIf="isLoaded(); else loading">
     <div class="filters">
       <div class="filter-control">
@@ -42,8 +43,6 @@
           [attr.data-request-id]="request.id"
           *ngFor="let request of filteredQueue()"
           [request]="request"
-          [currentCollegeId]="selectedUser().collegeId"
-          [currentAllowedBranches]="selectedUser().allowedBranches"
           (approve)="approve($event)"
           (reject)="reject($event)">
         </li>
@@ -136,32 +135,32 @@
       <select
         id="user-select"
         data-test="user-select"
-        [value]="selectedUser().id"
+        [value]="selectedUser()?.id"
         (change)="setSelectedUser($any($event.target).value)">
-        <option *ngFor="let user of testUsers" [value]="user.id">
+        <option *ngFor="let user of users()" [value]="user.id">
           {{ user.role }} — {{ user.name }}
         </option>
       </select>
     </div>
   </div>
 
-  <div class="panel-body user-card">
+  <div class="panel-body user-card" *ngIf="selectedUser() as user">
     <div class="user-card-heading">
       <div>
-        <div class="user-card-title">{{ selectedUser().name }}</div>
-        <div class="user-card-subtitle">Id: {{ selectedUser().id }}</div>
+        <div class="user-card-title">{{ user.name }}</div>
+        <div class="user-card-subtitle">Id: {{ user.id }}</div>
       </div>
-      <span class="badge badge-type">{{ selectedUser().role || 'Guest' }}</span>
+      <span class="badge badge-type">{{ user.role || 'Guest' }}</span>
     </div>
 
     <div class="user-card-meta">
       <div class="meta-row">
         <span class="meta-label">Permissions</span>
-        <span class="meta-value">{{ selectedUser().permissions.join(', ') }}</span>
+        <span class="meta-value">{{ user.permissions.join(', ') }}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">Allowed Branches</span>
-        <span class="meta-value">{{ selectedUser().allowedBranches.join(', ') }}</span>
+        <span class="meta-value">{{ user.allowedBranches.join(', ') }}</span>
       </div>
     </div>
   </div>
