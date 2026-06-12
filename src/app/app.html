@@ -3,7 +3,9 @@
 </div>
 <div class="panel">
   <h1>Enrolment Request Queue</h1>
-  Debug info: {{selectedUser()?.name}}
+  <div class="panel-info">
+    You are watching as: {{selectedUser()?.name}}
+  </div>
   <ng-container *ngIf="isLoaded(); else loading">
     <div class="filters">
       <div class="filter-control">

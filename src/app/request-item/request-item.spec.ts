@@ -84,11 +84,13 @@ describe('RequestItem', () => {
   });
 
   it('should return true for canApprove if user can approve', () => {
-    expect(component.canApprove(sampleRequest)).toEqual(true);
+    fixture.componentRef.setInput('request', sampleRequest);
+    expect(component.canApprove()).toEqual(true);
   });
 
   it('should return false for canApprove if user can not approve', () => {
-    expect(component.canApprove(branchMismatchRequest)).toEqual(false);
+    fixture.componentRef.setInput('request', branchMismatchRequest);
+    expect(component.canApprove()).toEqual(false);
   })
 
 });

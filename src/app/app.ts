@@ -27,6 +27,7 @@ export class App {
   protected readonly notificationMessage = signal<string | null>(null);
   protected readonly notificationMessageType = signal<string>('info');
 
+  protected readonly selectedUser: Signal<User | null>;
   protected readonly modalRequest = computed(() =>
     this.queue().find((request) => request.id === this.modalRequestId()),
   );
@@ -144,9 +145,6 @@ export class App {
     }, timeout);
   };
 
-  ngOnInit(): void {
-  }
-  readonly selectedUser: Signal<User | null>;
   constructor() {
     this.userService.loadUsers();
     this.selectedUser = this.userService.user;
@@ -159,4 +157,3 @@ export class App {
 
   }
 }
-

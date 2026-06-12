@@ -22,6 +22,10 @@ ul.panel-body {
   color: #e2e8f0;
 }
 
+.panel-info {
+  margin: 0 0 1rem;
+}
+
 .panel-footer {
   margin-top: 1.25rem;
   display: grid;

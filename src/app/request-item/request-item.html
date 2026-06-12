@@ -26,8 +26,8 @@
 
     <div
       class="request-warning"
-      *ngIf="!canApprove(requestData) && !canReject(requestData)">
-      <ng-container *ngIf="requestData.collegeId !== currentCollegeId(); else branchWarning">
+      *ngIf="!canApprove() && !canReject() && requestState().isPending && requestState().hasPermission">
+      <ng-container *ngIf="!requestState().isCurrentCollege else branchWarning">
         This request belongs to a different college and cannot be approved or rejected.
       </ng-container>
       <ng-template #branchWarning>
@@ -35,19 +35,19 @@
       </ng-template>
     </div>
 
-    <div class="request-actions" *ngIf="requestData.status === 'pending'">
+    <div class="request-actions" *ngIf="requestState().isPending">
       <button
         type="button"
         class="btn-approve"
         (click)="approve.emit(requestData.id)"
-        [disabled]="!canApprove(requestData)">
+        [disabled]="!canApprove()">
         Approve
       </button>
       <button
         type="button"
         class="btn-reject"
         (click)="reject.emit(requestData.id)"
-        [disabled]="!canReject(requestData)">
+        [disabled]="!canReject()">
         Reject
       </button>
     </div>

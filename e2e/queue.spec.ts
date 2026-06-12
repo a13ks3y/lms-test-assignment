@@ -43,7 +43,6 @@ test.describe('Enrollment queue', () => {
   });
 
   test('blocks approval/rejection for cross-college requests', async ({ page }) => {
-    await page.locator('[data-test="user-select"]').selectOption('501');
     const crossCollegeRow = page.locator('li[app-request-item][data-request-id="9006"]');
 
     await expect(crossCollegeRow).toBeVisible();

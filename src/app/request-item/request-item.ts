@@ -1,4 +1,4 @@
-import { Component, EventEmitter, input, output, inject } from '@angular/core';
+import { Component, EventEmitter, input, output, inject, signal, computed } from '@angular/core';
 import { DatePipe, NgIf, TitleCasePipe } from '@angular/common';
 import { FormatPaymentStatusPipe } from '../format-payment-status.pipe';
 import { Request } from '../queue.service';
@@ -16,56 +16,54 @@ export class RequestItem {
   readonly approve = output<number>();
   readonly reject = output<number>();
 
-  constructor() {
-    this.userService.loadUsers();
-  }
-
-  private canManageRequest(
-    request: Request,
-    permission: string
-  ): boolean {
+  readonly requestState = computed(() => {
+    const request = this.request();
     const user = this.userService.user();
-    console.log(!user ? '😭' : '😮');
-    console.log(user, user?.name);
-    console.log(user?.collegeId, request.collegeId);
-    const hasPermission =
-      user?.permissions.includes(permission) ?? false;
 
-    const isPending =
-      request.status === 'pending';
+    if (!request || !user) {
+      return {
+        isPending: false,
+        hasPermission: false,
+        isCurrentCollege: false,
+        isAllowedBranch: false,
+      };
+    }
+    const hasApprovePermission = user.permissions.includes('enroll_requests_approve');
+    const hasRejectPermission = user.permissions.includes('enroll_requests_reject');
+    return {
+      isPending: request.status === 'pending',
 
-    const isCurrentCollege =
-      request.collegeId === request.collegeId;
+      isCurrentCollege:
+        request.collegeId === user.collegeId,
 
-    const isAllowedBranch =
-      user?.allowedBranches.length === 0 ||
-      (user?.allowedBranches.includes(request.branch) ?? false);
-    console.log({
-      isPending,hasPermission,isCurrentCollege,isAllowedBranch
-    });
+      isAllowedBranch:
+        user.allowedBranches.length === 0 ||
+        user.allowedBranches.includes(request.branch),
+
+      hasApprovePermission,
+      hasRejectPermission,
+      hasPermission: hasApprovePermission || hasRejectPermission
+    };
+  });
+
+  readonly canApprove = computed(() => {
+    const state = this.requestState();
+
     return (
-      isPending &&
-      hasPermission &&
-      isCurrentCollege &&
-      isAllowedBranch
+      state.isPending &&
+      state.isCurrentCollege &&
+      state.isAllowedBranch &&
+      state.hasApprovePermission
     );
-  }
+  });
+  readonly canReject = computed(() => {
+    const state = this.requestState();
 
-  currentCollegeId():number {
-    return this.userService.user()?.collegeId ?? -1;
-  }
-
-  canApprove(request: Request): boolean {
-    return this.canManageRequest(
-      request,
-      'enroll_requests_approve'
+    return (
+      state.isPending &&
+      state.isCurrentCollege &&
+      state.isAllowedBranch &&
+      state.hasRejectPermission
     );
-  }
-
-  canReject(request: Request): boolean {
-    return this.canManageRequest(
-      request,
-      'enroll_requests_reject'
-    );
-  }
+  });
 }
