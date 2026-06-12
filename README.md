@@ -150,13 +150,13 @@ npm run build    # Production build
 ### Verification Checklist
 
 **Manual Checks:**
-- [ ] Load page; queue displays with all fields
-- [ ] Filters work independently and in combination
-- [ ] Counters update when filter changes
-- [ ] Click Approve on a pending request; confirm modal appears; confirm status changes and button disappears
-- [ ] Click Reject; modal asks for reason; if blank, error shown; with reason, status changes
-- [ ] Switch user to cross-college; buttons disabled with warning
-- [ ] Switch user with branch restriction; out-of-scope branches show disabled buttons with warning
+- [✓] Load page; queue displays with all fields
+- [✓] Filters work independently and in combination
+- [✓] Counters update when filter changes
+- [✓] Click Approve on a pending request; confirm modal appears; confirm status changes and button disappears
+- [✓] Click Reject; modal asks for reason; if blank, error shown; with reason, status changes
+- [✓] Switch user to cross-college; buttons disabled with warning
+- [✓] Switch user with branch restriction; out-of-scope branches show disabled buttons with warning
 
 **Tests:**
 ```bash
@@ -176,7 +176,6 @@ npm run e2e      # 5 E2E tests
 8. **Accessibility**: Should run full AXE audit and WCAG AA validation
 9. **Performance**: Currently no lazy loading; virtualization for 1000+ items would help
 10. **Error Handling**: No network retry logic; could add exponential backoff for transient failures
-11. "This request belongs to a different college and cannot be approved or rejected." message shows for approved/rejected status as well, not sure if it should be hidden
 
 ## Build & Deployment Notes
 
