@@ -8,13 +8,13 @@ describe('QueueService', () => {
   let httpMock: HttpTestingController;
 
   const adminUser: User = {
-    id: 1,
-    name: 'Admin User',
-    email: 'admin@example.com',
-    role: 'admin',
-    collegeId: 17,
-    permissions: ["enroll_requests_page", "enroll_requests_approve"],
-    allowedBranches: ["Science", "Licensing", "Retirement"],
+      "id": 701,
+      "name": "Maya Admin",
+      "role": "admin",
+      "collegeId": 17,
+      "email": "admin@mailinator.com",
+      "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
+      "allowedBranches": ["Licensing", "Retirement"]
   };
 
   const studentUser: User = {
@@ -24,7 +24,7 @@ describe('QueueService', () => {
     role: 'student',
     collegeId: 17,
     permissions: ['view'],
-    allowedBranches: ['Science'],
+    allowedBranches: ['Licensing'],
   };
 
   const sampleRequest: Request = {
@@ -32,7 +32,7 @@ describe('QueueService', () => {
     type: 'course',
     status: 'pending',
     collegeId: 17,
-    branch: 'Science',
+    branch: 'Licensing',
     submittedAt: '2026-06-10T00:00:00.000Z',
     source: 'web',
     paymentState: 'paid',
@@ -72,7 +72,7 @@ const collegeMismatchRequest: Request = {
     type: 'course',
     status: 'pending',
     collegeId: 88,
-    branch: 'Science',
+    branch: 'Licensing',
     submittedAt: '2026-06-10T00:00:00.000Z',
     source: 'web',
     paymentState: 'paid',
@@ -132,7 +132,7 @@ const collegeMismatchRequest: Request = {
 
     status = await service.updateRequestStatus(2, 'approved', adminUser);
     expect(service.queue()[1].status).toEqual('pending');
-    expect(status).toEqual('User Admin User Do not allowed to approve or reject branch Healthcare');
+    expect(status).toEqual('User Maya Admin Do not allowed to approve or reject branch Healthcare');
     status = await service.updateRequestStatus(3, 'approved', adminUser);
     expect(service.queue()[2].status).toEqual('pending');
     expect(status).toEqual('Wrong college');
