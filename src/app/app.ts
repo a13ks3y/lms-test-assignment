@@ -148,12 +148,5 @@ export class App {
   constructor() {
     this.userService.loadUsers();
     this.selectedUser = this.userService.user;
-    effect(() => {
-      const defaultUser = this.userService.user();
-      if (defaultUser && !this.userService.user()) {
-        this.userService.user.set(defaultUser);
-      }
-    });
-
   }
 }

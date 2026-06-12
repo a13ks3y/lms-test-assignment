@@ -1,11 +1,12 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { UserService } from './user.service';
+import { User, UserService } from './user.service';
+import { QueueService } from './queue.service';
 
 describe('App', () => {
   beforeEach(async () => {
-    const userSignal = signal<User>({
+    const adminUser = {
       "id": 701,
       "name": "Maya Admin",
       "role": "admin",
@@ -13,16 +14,25 @@ describe('App', () => {
       "email": "admin@mailinator.com",
       "permissions": ["enroll_requests_page", "enroll_requests_approve", "enroll_requests_reject"],
       "allowedBranches": ["Licensing", "Retirement"]
-    });
+    };
+
     const mockUserService = {
       loadUsers: () => {},
-      user: userSignal
-    }
+      user: signal<User>(adminUser as User),
+      users: signal([adminUser, adminUser, adminUser])
+    };
+    const mockQueueService = {
+      isLoaded: signal(false),
+      loadQueue: () => {}
+    };
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
         {
-          provide: UserService, useValue: mockUserService
+          provide: UserService, useValue: mockUserService,
+        },
+        {
+          provide: QueueService, useValue: mockQueueService
         }
       ]
     }).compileComponents();
