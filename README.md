@@ -180,7 +180,7 @@ npm run e2e      # 5 E2E tests
 ## Build & Deployment Notes
 
 - CSS budget warning: `app.css` is ~330 bytes over 4 KB target (safe; remove unused styles to optimize)
-- No environment config; uses `./data.json` for all runs
+- No environment config; uses `./test_input.json` for all runs
 - Production build output: `dist/lms/`
 - Run `npm run build` for prod bundle
 
